@@ -1,43 +1,31 @@
 import * as PIXI from "pixi.js";
-import { titleFontFamily, titleXOffset, titleYOffset, xMargin, yMargin } from "../theme";
+import ElementBuilder from "../elements/ElementBuilder";
+import Interaction from "../interactions/Interaction";
+import SlideDeck from "../slideDesk/SlideDeck";
 
 abstract class Slide {
-  protected app: PIXI.Application;
+  protected deck: SlideDeck;
   protected container: PIXI.Container = new PIXI.Container();
-  protected canvas: PIXI.Container;
+  protected build: ElementBuilder;
+  public steps: Interaction[] = [];
 
-  public constructor(app: PIXI.Application, canvas: PIXI.Container) {
-    this.app = app;
-    this.canvas = canvas;
+  protected constructor(deck: SlideDeck) {
+    this.deck = deck;
+    this.build = this.deck.elementBuilder;
   }
 
   public show() {
-    this.container = new PIXI.Container();
-    this.canvas.addChild(this.container);
+    this.deck.canvas.addChild(this.container);
     this.onEnter();
   }
 
   public hide() {
     this.onExit();
-    this.container.destroy({children: true, baseTexture: true, texture: true});
-    this.canvas.removeChild(this.container);
+    this.deck.canvas.removeChild(this.container);
   }
 
   protected abstract onEnter(): void;
   protected abstract onExit(): void;
-
-  protected title(text: string) {
-    const title = new PIXI.Text(text);
-    title.x = xMargin + titleXOffset;
-    title.y = yMargin + titleYOffset;
-    title.style.fill = 0xFFFFFF;
-    title.style.fontFamily = titleFontFamily;
-    title.style.fontVariant = "bold";
-    title.style.fontSize = 128;
-    title.style.letterSpacing = 1.2;
-    title.style.padding = 10;
-    return title;
-  }
 
   protected add(...objects: PIXI.DisplayObject[]) {
     objects.forEach(object => this.container.addChild(object));
