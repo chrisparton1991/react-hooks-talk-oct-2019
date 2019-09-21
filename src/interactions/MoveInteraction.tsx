@@ -10,7 +10,7 @@ class MoveInteraction implements Interaction {
   private readonly durationMs: number;
   private readonly offset: Point;
 
-  constructor(target: PIXI.DisplayObject, offset: Point, durationMs: number = 1000) {
+  constructor(target: PIXI.DisplayObject, offset: Point, durationMs: number) {
     this.target = target;
     this.durationMs = durationMs;
     this.offset = offset;
