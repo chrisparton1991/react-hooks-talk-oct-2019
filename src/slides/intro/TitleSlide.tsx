@@ -17,7 +17,6 @@ class TitleSlide extends Slide {
   }
 
   onEnter() {
-
   }
 
   onExit() {

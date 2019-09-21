@@ -33,8 +33,6 @@ class SlideDeck {
 
   public show() {
     this.app.stage.addChild(this.canvas);
-    this.app.view.style.width = '100%';
-    this.app.view.style.height = '100%';
     document.body.appendChild(this.app.view);
     this.currentSlide().show();
   }
@@ -46,6 +44,7 @@ class SlideDeck {
     this.background.beginFill(backgroundColor);
     this.background.drawRect(0, 0, canvasWidth, canvasHeight);
     this.background.endFill();
+
     this.canvas.addChild(this.background);
   }
 
@@ -74,12 +73,16 @@ class SlideDeck {
     const resize = () => {
       const {innerWidth: windowWidth, innerHeight: windowHeight} = window;
       const {canvasWidth, canvasHeight} = this.theme;
-      this.app.renderer.resize(windowWidth, windowHeight);
 
       const scale = Math.min(windowWidth / canvasWidth, windowHeight / canvasHeight);
+      const newWidth = canvasWidth * scale;
+      const newHeight = canvasHeight * scale;
+
+      this.app.view.style.width = newWidth + 'px';
+      this.app.view.style.height = newHeight + 'px';
+      this.app.renderer.resize(newWidth, newHeight);
+
       canvas.scale.x = canvas.scale.y = scale;
-      canvas.position.x = (windowWidth / 2) - (canvasWidth * scale / 2);
-      canvas.position.y = (windowHeight / 2) - (canvasHeight * scale / 2);
     };
 
     resize();
