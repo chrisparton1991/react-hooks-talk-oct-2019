@@ -15,11 +15,11 @@ class FadeInteraction implements Interaction {
     this.alphaOffset = alphaOffset;
   }
 
-  async apply(reverse: boolean) {
+  async apply(reverse: boolean, immediate: boolean) {
     const from = this.target.alpha;
     const to = reverse ? (from - this.alphaOffset) : (from + this.alphaOffset);
 
-    await animate(this.durationMs, progress => {
+    await animate(immediate ? 0.00001 : this.durationMs, progress => {
       this.target.alpha = from + (to - from) * progress;
     });
   }

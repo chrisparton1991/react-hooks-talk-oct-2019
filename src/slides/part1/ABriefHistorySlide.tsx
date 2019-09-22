@@ -12,8 +12,8 @@ class ABriefHistorySlide extends Slide {
     this.add(this.title);
 
     this.steps = [
-      move(this.title, {x: 100, y: 100}),
-      move(this.title, {x: 0, y: 200})
+      move(this.title, {x: 100, y: 100}, 200),
+      move(this.title, {x: 0, y: 200}, 200)
     ];
   }
 

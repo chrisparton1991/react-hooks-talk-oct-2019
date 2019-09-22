@@ -10,8 +10,8 @@ class GroupInteraction implements Interaction {
     this.interactions = interactions;
   }
 
-  async apply(reverse: boolean) {
-    await Promise.all(this.interactions.map(i => i.apply(reverse)));
+  async apply(reverse: boolean, immediate: boolean) {
+    await Promise.all(this.interactions.map(i => i.apply(reverse, immediate)));
   }
 }
 

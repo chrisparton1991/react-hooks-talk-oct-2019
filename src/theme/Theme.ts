@@ -22,6 +22,9 @@ interface Theme {
 
   /** Vertical title offset to account for font alignment issues. **/
   titleOffsetY: number;
+
+  /** The font to use for body text. **/
+  bodyFontFamily: string;
 }
 
 export default Theme;

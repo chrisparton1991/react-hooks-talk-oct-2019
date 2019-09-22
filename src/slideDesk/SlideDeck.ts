@@ -8,6 +8,7 @@ import Theme from "../theme/Theme";
 class SlideDeck {
   public app = new PIXI.Application({resolution: Math.max(window.devicePixelRatio, 2), antialias: true});
   public canvas = new PIXI.Container();
+  public globals = new PIXI.Container();
   public theme: Theme;
   public elementBuilder: ElementBuilder;
 
@@ -20,8 +21,10 @@ class SlideDeck {
   public constructor(theme: Theme) {
     this.theme = theme;
     this.elementBuilder = new ElementBuilder(theme);
+    this.app.stage.sortableChildren = true;
     this.drawCanvasBackground();
     this.drawCanvasBounds();
+    this.addGlobalsContainer();
     this.handleResize();
     this.handleInteraction();
   }
@@ -31,15 +34,35 @@ class SlideDeck {
     return this;
   }
 
-  public show() {
+  public loadGlobalObjects(loadFn: (slideDeck: SlideDeck) => PIXI.DisplayObject[]) {
+    const globalObjects = loadFn(this);
+    globalObjects.forEach(globalObject => this.globals.addChild(globalObject));
+    return this;
+  }
+
+  public async show() {
     this.app.stage.addChild(this.canvas);
-    document.body.appendChild(this.app.view);
     this.currentSlide().show();
+
+    const savedSlide = parseInt(sessionStorage.getItem("slideIndex") || "0");
+    const savedStep = parseInt(sessionStorage.getItem("stepIndex") || "0");
+
+    while (this.slideIndex < savedSlide && this.slideIndex < this.slides.length) {
+      await this.next(true);
+    }
+
+    while (this.stepIndex < savedStep && this.stepIndex < this.currentSlide().steps.length) {
+      await this.next(true);
+    }
+
+    // Ensure replay animations are finished before showing the canvas.
+    setTimeout(() => document.body.appendChild(this.app.view));
   }
 
   private drawCanvasBackground() {
     const {backgroundColor, canvasWidth, canvasHeight} = this.theme;
 
+    this.background.zIndex = 1;
     this.background.clear();
     this.background.beginFill(backgroundColor);
     this.background.drawRect(0, 0, canvasWidth, canvasHeight);
@@ -67,6 +90,11 @@ class SlideDeck {
     Mousetrap.bind("b b", () => bounds.renderable = !bounds.renderable);
   }
 
+  private addGlobalsContainer() {
+    this.globals.zIndex = 2;
+    this.canvas.addChild(this.globals);
+  }
+
   private handleResize() {
     const {canvas} = this;
 
@@ -91,7 +119,7 @@ class SlideDeck {
 
   private handleInteraction() {
     Mousetrap.bind(["up", "left"], this.prev);
-    Mousetrap.bind(["down", "right"], this.next);
+    Mousetrap.bind(["down", "right"], () => this.next(false));
   }
 
   private prev = async () => {
@@ -103,7 +131,7 @@ class SlideDeck {
 
     this.isTransitioning = true;
     this.stepIndex--;
-    await this.currentStep().apply(true);
+    await this.currentStep().apply(true, false);
 
     if (this.stepIndex < 0) {
       this.currentSlide().hide();
@@ -114,9 +142,11 @@ class SlideDeck {
     }
 
     this.isTransitioning = false;
+    sessionStorage.setItem("slideIndex", this.slideIndex.toString());
+    sessionStorage.setItem("stepIndex", this.stepIndex.toString());
   };
 
-  private next = async () => {
+  private next = async (immediate: boolean = false) => {
     if (this.isTransitioning) {
       return; // Need to wait for current transition to finish.
     } else if (this.slideIndex === this.slides.length - 1 && this.stepIndex === this.currentSlide().steps.length) {
@@ -124,7 +154,7 @@ class SlideDeck {
     }
 
     this.isTransitioning = true;
-    await this.currentStep().apply(false);
+    await this.currentStep().apply(false, immediate);
     this.stepIndex++;
 
     if (this.stepIndex > this.currentSlide().steps.length) {
@@ -136,6 +166,8 @@ class SlideDeck {
     }
 
     this.isTransitioning = false;
+    sessionStorage.setItem("slideIndex", this.slideIndex.toString());
+    sessionStorage.setItem("stepIndex", this.stepIndex.toString());
   };
 
   private currentStep = () => {

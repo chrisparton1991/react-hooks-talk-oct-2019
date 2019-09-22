@@ -1,4 +1,3 @@
-import { move } from "../../interactions/Interactions";
 import SlideDeck from "../../slideDesk/SlideDeck";
 import Slide from "../Slide";
 
@@ -10,10 +9,10 @@ class TitleSlide extends Slide {
     this.title = this.build.title("React Hooks");
     this.add(this.title);
 
-    this.steps = [
-      move(this.title, {x: 100, y: 100}),
-      move(this.title, {x: 0, y: 200}),
-    ];
+    const body = this.build.body(["‣😀 Some body text", "Line 2"], this.title.height);
+    this.add(body);
+
+    this.steps = [];
   }
 
   onEnter() {

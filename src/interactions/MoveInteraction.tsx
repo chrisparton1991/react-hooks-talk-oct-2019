@@ -16,13 +16,13 @@ class MoveInteraction implements Interaction {
     this.offset = offset;
   }
 
-  async apply(reverse: boolean) {
+  async apply(reverse: boolean, immediate: boolean) {
     const from = {x: this.target.position.x, y: this.target.position.y};
     const to = reverse ?
       {x: from.x - this.offset.x, y: from.y - this.offset.y} :
       {x: from.x + this.offset.x, y: from.y + this.offset.y};
 
-    await animate(this.durationMs, progress => {
+    await animate(immediate ? 0.00001 : this.durationMs, progress => {
       this.target.position.x = from.x + (to.x - from.x) * progress;
       this.target.position.y = from.y + (to.y - from.y) * progress;
     });

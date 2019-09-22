@@ -1,6 +1,6 @@
 interface Interaction {
 
-  apply(reverse: boolean): Promise<void>;
+  apply(reverse: boolean, immediate: boolean): Promise<void>;
 }
 
 export default Interaction;

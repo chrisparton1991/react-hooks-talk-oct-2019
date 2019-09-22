@@ -26,6 +26,9 @@ const theme: Theme = {
 
   /** Vertical title offset to account for font alignment issues. **/
   titleOffsetY: -42,
+
+  /** The font to use for body text. **/
+  bodyFontFamily: "Lato"
 };
 
 export default theme;

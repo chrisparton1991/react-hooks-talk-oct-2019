@@ -1,5 +1,6 @@
 import 'normalize.css'
 import WebFont from "webfontloader";
+import ReactLogo from "./globalObjects/ReactLogo";
 import SlideDeck from "./slideDesk/SlideDeck";
 import AboutMeSlide from "./slides/intro/AboutMeSlide";
 import HobbiesSlide from "./slides/intro/HobbiesSlide";
@@ -12,17 +13,22 @@ const theme = defaultTheme;
 
 WebFont.load({
   custom: {
-    families: [theme.titleFontFamily],
+    families: [theme.titleFontFamily, theme.bodyFontFamily],
     urls: ['fonts/fonts.css']
   },
   active: start
 });
 
-function start() {
-  new SlideDeck(theme).loadSlides(deck => [
-    new TitleSlide(deck),
-    new AboutMeSlide(deck),
-    new HobbiesSlide(deck),
-    new ABriefHistorySlide(deck)
-  ]).show();
+async function start() {
+  await new SlideDeck(theme)
+    .loadSlides(deck => [
+      new TitleSlide(deck),
+      new AboutMeSlide(deck),
+      new HobbiesSlide(deck),
+      new ABriefHistorySlide(deck)
+    ])
+    .loadGlobalObjects(deck => [
+      ReactLogo.getInstance(deck)
+    ])
+    .show();
 }
